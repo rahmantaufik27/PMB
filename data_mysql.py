@@ -2,15 +2,16 @@ import mysql.connector
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
-
 class Database:
-    def __init__(self, host, user, password, database):
+    # initiation
+    def __init__(self, host, user, password, database, port):
         self.host = host
         self.user = user
         self.password = password
         self.database = database
+        self.port = port
 
+    # connect to database
     def connect(self):
         try:
             self.db = mysql.connector.connect(
@@ -18,12 +19,13 @@ class Database:
                 user = self.user,
                 password = self.password,
                 database = self.database,
-                port = "3306"
+                port = self.port
             )
             # print(self.db)
         except mysql.connector.Error as e:
             print(f"Gagal terhubung ke database: {e}")
 
+    # select all
     def select_all(self, table_name):
         try:
             cursor = self.db.cursor()
@@ -37,10 +39,11 @@ class Database:
         except mysql.connector.Error as e:
             print(f"Gagal melakukan select all: {e}")
 
+    # select where nip
     def select_nip(self, table_name, nip):
         try:
             cursor = self.db.cursor()
-            cursor.execute(f"SELECT * FROM {table_name} WHERE NIP = {nip}")
+            cursor.execute(f"SELECT * FROM {table_name} WHERE nip = {nip}")
             results = cursor.fetchone()
             if results:
                 # print(results)
@@ -51,10 +54,11 @@ class Database:
         except mysql.connector.Error as e:
             print(f"Gagal melakukan select nip: {e}")
 
+    # update no hp where nip
     def update_nohp(self, table_name, nip, nohp):
         try:
             cursor = self.db.cursor()
-            query = f"UPDATE {table_name} SET `No HP` = {nohp} WHERE nip = {nip}"
+            query = f"UPDATE {table_name} SET no_hp = {nohp} WHERE nip = {nip}"
             cursor.execute(query)
             self.db.commit()
 
@@ -66,11 +70,31 @@ class Database:
         except mysql.connector.Error as e:
             print(f"Gagal melakukan update nomer hp: {e}")
 
+    # insert log data
+    def insert_log_hp_updated(self, table_name, nip, nohp):
+        try:
+            cursor = self.db.cursor()
+            ket = "update no hp"
+            query = f"INSERT INTO {table_name} (nip, no_hp, status) VALUES (%s, %s, %s)"
+            values = (nip, nohp, ket)
+            cursor.execute(query, values)
+            self.db.commit()
+
+            if cursor.rowcount == 1:
+                return "inserted"
+            else:
+                return "tidak ter-insert"
+            
+        except mysql.connector.Error as e:
+            print(f"Gagal melakukan insert data log: {e}")
+
+
 # load_dotenv()
 # host = os.environ["db_host"]
 # username = os.environ["db_user"]
 # password = os.environ["db_password"]
 # database_name = os.environ["db_database"]
+# port = os.environ["db_port"]
 
-# db = Database(host, username, password, database_name)
+# db = Database(host, username, password, database_name, port)
 # db.connect()
