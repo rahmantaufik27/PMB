@@ -51,11 +51,26 @@ class Database:
         except mysql.connector.Error as e:
             print(f"Gagal melakukan select nip: {e}")
 
-load_dotenv()
-host = os.environ["db_host"]
-username = os.environ["db_user"]
-password = os.environ["db_password"]
-database_name = os.environ["db_database"]
+    def update_nohp(self, table_name, nip, nohp):
+        try:
+            cursor = self.db.cursor()
+            query = f"UPDATE {table_name} SET `No HP` = {nohp} WHERE nip = {nip}"
+            cursor.execute(query)
+            self.db.commit()
 
-db = Database(host, username, password, database_name)
-db.connect()
+            if cursor.rowcount == 1:
+                return "updated"
+            else:
+                return "tidak terupdate"
+
+        except mysql.connector.Error as e:
+            print(f"Gagal melakukan update nomer hp: {e}")
+
+# load_dotenv()
+# host = os.environ["db_host"]
+# username = os.environ["db_user"]
+# password = os.environ["db_password"]
+# database_name = os.environ["db_database"]
+
+# db = Database(host, username, password, database_name)
+# db.connect()
