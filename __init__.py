@@ -63,7 +63,7 @@ class Database:
     def update_nohp(self, table_name, nip, nohp):
         try:
             cursor = self.db.cursor()
-            query = f"UPDATE {table_name} SET no_hp = {nohp} WHERE nip = {nip}"
+            query = f"UPDATE {table_name} SET no_hp = '{nohp}' WHERE nip = {nip}"
             cursor.execute(query)
             self.db.commit()
 
@@ -99,18 +99,47 @@ db = Database("103.3.46.185", "simanila", "simanila@2024", "pmb", "3306")
 # homepage (display welcome and form input nip)
 @app.route('/')
 async def index():
-    return """
-        <html>
-            <style>body { display: flex; align-items: center; justify-content: center; height: 100vh; }</style>
+    content_html = """
+        <!doctype html>
+            <html lang="en">
+            <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <title>PMB</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+            </head>
             <body>
-                <form action="/pengawas_nip" method="POST">
-                    <h3>Silahkan Masukan NIP untuk mengetahui penampatan lokasi pengawas </h3>
-                    NIP : <input type="text" name="nip" id="nip" required><br>
-                    <input type="submit" value="Submit" />
-                </form>
+                <div class="container mt-5">
+                    <div class="row justify-content-center">
+                        <div class="col-xl-6 col-lg-6 col-md-6">
+                            <div class="card shadow-lg">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-dark text-center">Penempatan Lokasi Pengawasi</h6>
+                                </div>
+                                <form action="/pengawas_nip" method="POST">
+                                    <div class="card-body pt-4 pb-4 text-center">
+                                        <div class="mb-3">
+                                            <p class="card-text mb-0">Silahkan Masukan NIP untuk mengetahui penampatan lokasi pengawas</p><br>
+                                            <div class="form-floating mb-3">
+                                                <input type="text" class="form-control" placeholder="Nomor Identitas Pegawai" name="nip" id="nip" required>
+                                                <label for="floatingInput">Nomor Identitas Pegawai</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer d-flex justify-content-end">
+                                        <button type="submit" class="btn btn-dark">Submit</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
             </body>
-        </html>
+            </html>
+
     """
+    return content_html
 
 # show specific pengawas based on nip
 # if the pengawas doesnt have no hp then must be updated
@@ -119,37 +148,126 @@ async def load_nip_pengawas():
     db.connect()
     nip = request.form["nip"]
     res = db.select_nip("pengawas", str(nip))
-    css = "body { display: flex; align-items: center; justify-content: center; height: 100vh; }"
-    # hp = res[-1]
-    hp = int(0 if res[-1] is None else res[-1])
+
+    content_html_data = f"""
+        <!doctype html>
+        <html lang="en">
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>PMB</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        </head>
+        <body>
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                        <div class="card shadow-lg">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-dark text-center">Penempatan Lokasi Pengawas</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <table class="table table-borderless">
+                                        <tbody>
+                                            <tr>
+                                                <td>NIP</td>
+                                                <td>:</td>
+                                                <td>{res[5]}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Nama</td>
+                                                <td>:</td>
+                                                <td>{res[3]}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>No. Hp</td>
+                                                <td>:</td>
+                                                <td>{res[-1]}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Jadwal</td>
+                                                <td>:</td>
+                                                <td>{res[4]}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Nama Lokasi</td>
+                                                <td>:</td>
+                                                <td>{res[1]}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Nama Ruangan</td>
+                                                <td>:</td>
+                                                <td>{res[2]}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        </body>
+        </html>
+    """
+    input_hp = """
+        <div class="form-floating mb-3">
+            <input type="text" inputmode="numeric" pattern="[0-9]{1,20}" class="form-control" placeholder="Nomer HP" name="hp_new" id="hp_new" required>
+            <label for="floatingInput">Nomer HP</label>
+        </div>
+    """
+    content_html_update = f"""
+        <!doctype html>
+        <html lang="en">
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>PMB</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        </head>
+        <body>
+            <div class="container mt-5">
+                <div class="row d-flex align-item-center justify-content-center" style="height:100%;">
+                    <div class="col-xl-6 col-lg-6 col-md-6">
+                        <div class="card shadow-lg">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-dark text-center">Sistem Penerimaan Mahasiswa Baru</h6>
+                            </div>
+                            <form action="/pengawas_update_hp" method="POST">
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <p class="card-text mb-0 text-center">Silahkan Masukan Nomor HP untuk melengkapi data pengawas</p><br>
+                                        <div class="form-floating mb-3">
+                                            <input type="text" class="form-control" id="floatingInput" value="{res[5]}" name="nip" id="nip" readonly>
+                                            <label for="floatingInput">Nomor Identitas Pegawai</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input type="text" class="form-control" id="floatingInput" value="{res[3]}"readonly>
+                                            <label for="floatingInput">Nama</label>
+                                        </div>
+                                        {input_hp}
+                                    </div>
+                                </div>
+                                <div class="card-footer d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-dark">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        </body>
+        </html>
+    """
+    
+    hp = int(0 if res[-1] is None or res[-1] == "" else res[-1])
     if hp != 0:
-        return f"""
-            <html>
-                <style>{css}</style>
-                <body>
-                        NIP : {res[5]} <br/>
-                        Nama : {res[3]} <br/>
-                        No Hp : {res[-1]} <br/>
-                        Jadwal : {res[4]} <br/>
-                        Nama Lokasi : {res[1]} <br/>
-                        Nama Ruangan : {res[2]} <br/>
-                </body>
-            </html>
-        """
+        return content_html_data
     else:
-        return f"""
-            <html>
-                <style>{css}</style>
-                <body>
-                    <form action="/pengawas_update_hp" method="POST">
-                        NIP : <input type="text" name="nip" id="nip" value={res[5]} readonly><br>
-                        Nama : <label>{res[3]}</label><br/>
-                        Nomer HP : <input type="text" name="hp_new" id="hp_new"><br>
-                        <input type="submit" value="Submit" />
-                    </form>
-                </body>
-            </html>
-        """
+        return content_html_update
         
     
 # show form for updating the hp
