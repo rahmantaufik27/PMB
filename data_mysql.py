@@ -21,7 +21,7 @@ class Database:
                 database = self.database,
                 port = self.port
             )
-            # print(self.db)
+            print(self.db)
         except mysql.connector.Error as e:
             print(f"Gagal terhubung ke database: {e}")
 
@@ -89,12 +89,12 @@ class Database:
             print(f"Gagal melakukan insert data log: {e}")
 
 
-# load_dotenv()
-# host = os.environ["db_host"]
-# username = os.environ["db_user"]
-# password = os.environ["db_password"]
-# database_name = os.environ["db_database"]
-# port = os.environ["db_port"]
+load_dotenv()
+host = os.environ["db_host"]
+username = os.environ["db_user"]
+password = os.environ["db_password"]
+database_name = os.environ["db_database"]
+port = os.environ["db_port"]
 
-# db = Database(host, username, password, database_name, port)
-# db.connect()
+db = Database(host, username, password, database_name, port)
+db.connect()

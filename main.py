@@ -95,5 +95,5 @@ async def update_hp_pengawas(nip: str, hp: Union[str, None] = None):
 #     return parsed
 
 
-# if __name__ == "__main__":
-#     main()
+# if __name__ == '__main__':
+#     uvicorn.run(app, port=8000, host='localhost')
