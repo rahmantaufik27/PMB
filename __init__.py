@@ -141,7 +141,7 @@ class Database:
             print(f"Gagal melakukan select all untuk pj pengawas: {e}")
 
 # connect database with parameters
-db = Database("localhost", "root", "erte27693", "PMB", "3306")
+db = Database("localhost", "adminsimanila", "simanila@2024", "pmb", "3306")
 
 # homepage (display welcome and form input nip)
 @app.route('/')
@@ -212,7 +212,7 @@ def load_pengawas_update_hp():
     hp = request.form["hp_new"]
     dt = datetime.now()
     dt = dt.strftime('%Y-%m-%d')
-    db.update_nohp("pengawas", str(nip), str(hp))
+    db.update_nohp("pengawas_simanila", str(nip), str(hp))
     db.insert_log_hp_updated("log_pengawas", str(nip), dt)
     return redirect(url_for('index'))
 
@@ -222,7 +222,7 @@ def pengawas_proses(nip_p):
     dt = dt.strftime('%Y-%m-%d')
     nip = nip_p
     db.insert_log_login("log_pengawas", str(nip), dt)
-    res = db.select_nip("pengawas", str(nip))
+    res = db.select_nip("pengawas_simanila", str(nip))
     if res != 0:
         content_html_data = f"""
             <!doctype html>
@@ -495,7 +495,7 @@ def testing(nip_pj):
 @app.route('/pengawas_all')
 def load_all_pengawas():
     db.connect()
-    res = db.select_all("pengawas")
+    res = db.select_all("pengawas_simanila")
     return res
 
 if __name__ == "__main__":
